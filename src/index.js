@@ -13,14 +13,16 @@ const els = {
   canvas: document.getElementById('canvas'),
 };
 
+let model = null;
+
 const start = async () => {
-  const net = await posenet.load(modelOptions);
   els.video.addEventListener('canplay', () => videoReady());
+  model = await createModel();
   els.video.srcObject = await getCamera();
   els.video.play();
 };
 
-const videoReady = () => {
+const videoReady = async () => {
   const { canvas, video } = els;
   const { videoWidth, videoHeight } = video;
 
@@ -34,23 +36,32 @@ const videoReady = () => {
   update();
 };
 
-const getCamera = async () => {
+/**
+ * @returns promise
+ */
+const getCamera = () => {
   try {
     const opts = { video: true, audio: false };
-    return await navigator.mediaDevices.getUserMedia(opts);
+    return navigator.mediaDevices.getUserMedia(opts);
   } catch (e) {
     console.log('Error starting video stream:', err);
   }
 };
 
+/**
+ * @returns promise
+ */
+const createModel = () => {
+  return posenet.load(modelOptions);
+};
+
 const update = async () => {
-  // const video = document.getElementById('video')
-  // const canvas = document.getElementById('canvas')
   const { video, canvas } = els;
-  const opts = { flipHorizontal: false };
   const context = canvas.getContext('2d');
+  const opts = { flipHorizontal: false };
+
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  const pose = await net.estimateSinglePose(video, opts);
+  const pose = await model.estimateSinglePose(video, opts);
 
   requestAnimationFrame(update);
 };
