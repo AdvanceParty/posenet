@@ -13,7 +13,16 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "@tensorflow/tfjs-converter": "^1.2.8",
+    "@tensorflow/tfjs-core": "^1.2.8",
+    "@types/jasmine": "^3.4.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
     "parcel-bundler": "^1.12.3"
+  },
+  "dependencies": {
+    "@tensorflow-models/posenet": "^2.1.3"
   }
 }
