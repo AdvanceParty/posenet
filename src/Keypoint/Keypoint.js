@@ -43,7 +43,9 @@ export class Keypoint {
       score != null
         ? score >= THRESHOLD.MEDIUM
           ? score >= THRESHOLD.HIGH
-            ? CONFIDENCE.HIGH
+            ? score >= THRESHOLD.VERY_HIGH
+              ? CONFIDENCE.VERY_HIGH
+              : CONFIDENCE.HIGH
             : CONFIDENCE.MEDIUM
           : CONFIDENCE.LOW
         : null;

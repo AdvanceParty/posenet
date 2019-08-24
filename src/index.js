@@ -7,7 +7,7 @@ import './styles.css';
 const posenet = require('@tensorflow-models/posenet');
 const PARTS = require('./Keypoint/parts');
 const CONFIDENCE = require('./Keypoint/confidence');
-const minConfidenceToRender = CONFIDENCE.HIGH;
+const minConfidenceToRender = CONFIDENCE.VERY_HIGH;
 
 const pics = [];
 pics[PARTS.RIGHT_EYE] = new Image();
@@ -26,10 +26,14 @@ const fr = new FrameRater();
 const hud = new Hud();
 
 const modelOptions = {
-  architecture: 'MobileNetV1',
-  outputStride: 16,
-  inputResolution: 513,
-  multiplier: 0.75,
+  // architecture: 'MobileNetV1',
+  // outputStride: 16,
+  // inputResolution: 513,
+  // multiplier: 0.75,
+  architecture: 'ResNet50',
+  outputStride: 32,
+  inputResolution: 257,
+  quantBytes: 2,
 };
 
 const els = {
@@ -93,7 +97,7 @@ const createModel = () => posenet.load(modelOptions);
 
 const update = async () => {
   const pose = await getPose(els.video);
-  const points = getPointsFromPoseData(pose);
+  const points = getPointsFromPoseData(pose[0]);
 
   drawScene(points);
 
@@ -109,8 +113,13 @@ const update = async () => {
 };
 
 const getPose = img => {
-  const opts = { flipHorizontal: true };
-  return model.estimateSinglePose(img, opts);
+  const opts = {
+    flipHorizontal: true,
+    maxDetections: 1,
+    scoreThreshold: 0.8,
+  };
+  return model.estimateMultiplePoses(img, opts);
+  // return model.estimateSinglePose(img, opts);
 };
 
 const drawScene = points => {
@@ -120,8 +129,8 @@ const drawScene = points => {
 
   drawImg(points[PARTS.RIGHT_EYE], context, pics[PARTS.RIGHT_EYE]);
   drawImg(points[PARTS.LEFT_EYE], context, pics[PARTS.LEFT_EYE]);
-  // drawImg(points[PARTS.RIGHT_EAR], context, pics[PARTS.RIGHT_EAR]);
-  // drawImg(points[PARTS.LEFT_EAR], context, pics[PARTS.LEFT_EAR]);
+  drawImg(points[PARTS.RIGHT_EAR], context, pics[PARTS.RIGHT_EAR]);
+  drawImg(points[PARTS.LEFT_EAR], context, pics[PARTS.LEFT_EAR]);
 };
 
 const drawImg = (point, context, img) => {
